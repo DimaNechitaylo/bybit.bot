@@ -1,22 +1,23 @@
 package com.nechytailo.bybit.bot.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name="accounts")
 public class Account {
+
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    private String accountHost;
     private String apiKey;
     private String apiSecret;
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL) //TODO check it
+    @JoinColumn(name = "proxy_params_id")
     private ProxyParams proxyParams;
 }

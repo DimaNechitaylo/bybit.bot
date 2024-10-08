@@ -17,7 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.net.Proxy;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,9 +24,6 @@ import java.util.Map;
 public class BybitApiServiceImpl implements BybitApiService {
 
     private static final Logger LOG = LoggerFactory.getLogger(BybitApiServiceImpl.class);
-
-    @Value("${bybit.api.token}")
-    private String token;
 
     @Value("${bybit.api.accountType}")
     private String accountType;
@@ -47,7 +43,7 @@ public class BybitApiServiceImpl implements BybitApiService {
     @Override
     public void placeMarketOrder(Account account, String symbol, String side, String quantity) {
         RestTemplate restTemplate = proxyRequestService.createRestTemplateWithProxy(account.getProxyParams()); //TODO account == null
-        long timestamp = System.currentTimeMillis();//TODO maybe change
+        String timestamp = String.valueOf(getServerTime(restTemplate));
 
         Map<String, Object> params = new HashMap<>();
         params.put("category", "spot");
@@ -77,9 +73,9 @@ public class BybitApiServiceImpl implements BybitApiService {
     }
 
     @Override
-    public String getCoinBalance(Account account) {
+    public String getCoinBalance(Account account, String token) {
         RestTemplate restTemplate = proxyRequestService.createRestTemplateWithProxy(account.getProxyParams()); //TODO account == null
-        String timestamp = String.valueOf(getServerTime(null));//TODO
+        String timestamp = String.valueOf(getServerTime(restTemplate));
         Map<String, Object> params = new HashMap<>();
         params.put("accountType", accountType);
         params.put("coin", token);
@@ -88,7 +84,6 @@ public class BybitApiServiceImpl implements BybitApiService {
         String url = urls.getCoinBalanceUrl(accountType, token);
 
         try {
-            // Set headers and make the request
             HttpHeaders headers = new HttpHeaders();
             headers.set("X-BAPI-API-KEY", account.getApiKey());
             headers.set("X-BAPI-SIGN", signature);
@@ -99,12 +94,11 @@ public class BybitApiServiceImpl implements BybitApiService {
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
             return response.getBody();
         } catch (Exception e) {
-            return "Error retrieving balance for account ";
+            return "Error retrieving balance for account "; //TODO
         }
     }
 
-    public Long getServerTime(Proxy proxy) {
-        RestTemplate restTemplate = new RestTemplate(); //TODO
+    public Long getServerTime(RestTemplate restTemplate) {
         String url = urls.getSystemTimeUrl();
         try {
             ResponseEntity<ServerTimeDto> response = restTemplate.getForEntity(url, ServerTimeDto.class);
@@ -115,7 +109,7 @@ public class BybitApiServiceImpl implements BybitApiService {
         } catch (Exception e) {
             e.printStackTrace(); //TODO
         }
-        return null;
+        return null; //TODO
     }
 
 }

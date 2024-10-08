@@ -30,7 +30,7 @@ public class HealthCheckController {
 
     @GetMapping("/asset")
     public List<String> getAsset() {
-        return balanceInfoService.getBalances();
+        return balanceInfoService.getBalances("USDT");
     }
 
 }

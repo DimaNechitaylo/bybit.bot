@@ -14,7 +14,7 @@ import java.net.Proxy;
 @Service
 public class ProxyRequestServiceImpl implements ProxyRequestService {
 
-    @Value("{$proxy.enabled:true}")
+    @Value("${proxy.enabled:true}")
     private boolean proxyEnabled;
 
     @Override
