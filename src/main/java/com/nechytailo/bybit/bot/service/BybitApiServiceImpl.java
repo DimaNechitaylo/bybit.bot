@@ -66,7 +66,7 @@ public class BybitApiServiceImpl implements BybitApiService {
         headers.set("Content-Type", "application/json");
 
         ResponseEntity<String> response = restTemplate.postForEntity(url, new HttpEntity<>(paramsJson, headers), String.class);
-        LOG.info("%@@@@@@@% response: {}", response.getBody());
+        LOG.debug("Response: {}", response);
         if (!response.getStatusCode().is2xxSuccessful()) {
             throw new RuntimeException("Error placing order: " + response.getStatusCode());
         }
@@ -92,6 +92,7 @@ public class BybitApiServiceImpl implements BybitApiService {
 
             HttpEntity<String> entity = new HttpEntity<>(headers);
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+            LOG.debug("Response: {}", response);
             return response.getBody();
         } catch (Exception e) {
             return "Error retrieving balance for account "; //TODO
