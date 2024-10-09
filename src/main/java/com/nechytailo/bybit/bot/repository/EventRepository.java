@@ -1,7 +1,7 @@
 package com.nechytailo.bybit.bot.repository;
 
-import com.nechytailo.bybit.bot.model.EventStatus;
-import com.nechytailo.bybit.bot.model.TradeEvent;
+import com.nechytailo.bybit.bot.entity.EventStatus;
+import com.nechytailo.bybit.bot.entity.TradeEvent;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDateTime;

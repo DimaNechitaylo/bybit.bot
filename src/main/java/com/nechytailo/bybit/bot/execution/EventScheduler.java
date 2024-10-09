@@ -1,7 +1,7 @@
 package com.nechytailo.bybit.bot.execution;
 
-import com.nechytailo.bybit.bot.model.EventStatus;
-import com.nechytailo.bybit.bot.model.TradeEvent;
+import com.nechytailo.bybit.bot.entity.EventStatus;
+import com.nechytailo.bybit.bot.entity.TradeEvent;
 import com.nechytailo.bybit.bot.service.EventService;
 import com.nechytailo.bybit.bot.service.TradingService;
 import org.slf4j.Logger;
@@ -40,12 +40,11 @@ public class EventScheduler {
         return Duration.ofMinutes(lookAheadTime);
     }
 
-    @Scheduled(fixedRate = 10000) // Проверка каждые 10 секунд
+    @Scheduled(fixedRate = 10000) // 10 sec
     public void scheduleUpcomingEvents() {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime lookAheadTime = now.plus(getLookAheadDuration());
 
-        // Получаем события, которые должны быть выполнены в ближайшие 5 минут
         List<TradeEvent> tradeEvents = eventService.getPendingEventsWithinTimeRange(now, lookAheadTime);
 
         for (TradeEvent tradeEvent : tradeEvents) {
@@ -57,7 +56,6 @@ public class EventScheduler {
         logEventsToSchedule(tradeEvents);
     }
 
-    // Метод для выполнения события
     private void executeEvent(TradeEvent tradeEvent) {
         try {
             LocalDateTime now = LocalDateTime.now();

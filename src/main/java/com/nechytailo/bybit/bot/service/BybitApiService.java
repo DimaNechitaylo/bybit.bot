@@ -1,6 +1,6 @@
 package com.nechytailo.bybit.bot.service;
 
-import com.nechytailo.bybit.bot.model.Account;
+import com.nechytailo.bybit.bot.entity.Account;
 
 public interface BybitApiService {
 

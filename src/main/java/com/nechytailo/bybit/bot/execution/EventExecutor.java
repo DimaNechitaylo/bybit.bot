@@ -1,7 +1,7 @@
 package com.nechytailo.bybit.bot.execution;
 
-import com.nechytailo.bybit.bot.model.EventStatus;
-import com.nechytailo.bybit.bot.model.TradeEvent;
+import com.nechytailo.bybit.bot.entity.EventStatus;
+import com.nechytailo.bybit.bot.entity.TradeEvent;
 import com.nechytailo.bybit.bot.service.EventService;
 import com.nechytailo.bybit.bot.service.TradingService;
 import org.springframework.beans.factory.annotation.Autowired;

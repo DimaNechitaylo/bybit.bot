@@ -1,6 +1,6 @@
 package com.nechytailo.bybit.bot.factory;
 
-import com.nechytailo.bybit.bot.model.ProxyParams;
+import com.nechytailo.bybit.bot.entity.ProxyParams;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
@@ -30,17 +30,18 @@ public class ProxyRequestServiceImpl implements ProxyRequestService {
         Authenticator.setDefault(new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
-                if (getRequestingHost().equals(proxyHost)) {
+                if (getRequestingHost().equalsIgnoreCase(proxyHost)) {
                     return new PasswordAuthentication(proxyUser, proxyPassword.toCharArray());
                 }
                 return null;
             }
         });
-        Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyHost, proxyPort));
+        Proxy proxy = new Proxy(Proxy.Type.SOCKS, new InetSocketAddress(proxyHost, proxyPort));
         SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
         factory.setProxy(proxy);
-        
+
         return new RestTemplate(factory);
     }
+
 
 }

@@ -3,7 +3,7 @@ package com.nechytailo.bybit.bot.service;
 import com.google.gson.Gson;
 import com.nechytailo.bybit.bot.dto.ServerTimeDto;
 import com.nechytailo.bybit.bot.factory.ProxyRequestService;
-import com.nechytailo.bybit.bot.model.Account;
+import com.nechytailo.bybit.bot.entity.Account;
 import com.nechytailo.bybit.bot.utils.URLs;
 import com.nechytailo.bybit.bot.utils.UniqueOrderLinkIdGenerator;
 import org.slf4j.Logger;
@@ -65,7 +65,10 @@ public class BybitApiServiceImpl implements BybitApiService {
         headers.set("X-BAPI-RECV-WINDOW", recvWindow);
         headers.set("Content-Type", "application/json");
 
+        long startTime = System.currentTimeMillis();
         ResponseEntity<String> response = restTemplate.postForEntity(url, new HttpEntity<>(paramsJson, headers), String.class);
+        long endTime = System.currentTimeMillis();
+        LOG.debug("Processing time: {}", (endTime - startTime));
         LOG.debug("Response: {}", response);
         if (!response.getStatusCode().is2xxSuccessful()) {
             throw new RuntimeException("Error placing order: " + response.getStatusCode());

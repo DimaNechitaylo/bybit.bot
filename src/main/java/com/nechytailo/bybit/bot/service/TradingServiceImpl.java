@@ -1,27 +1,21 @@
 package com.nechytailo.bybit.bot.service;
 
-import com.nechytailo.bybit.bot.model.Account;
-import com.nechytailo.bybit.bot.model.ProxyParams;
+import com.nechytailo.bybit.bot.entity.Account;
+import com.nechytailo.bybit.bot.exception.NoAccountsException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
-import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 @Service
 public class TradingServiceImpl implements TradingService{
 
     private static final Logger LOG = LoggerFactory.getLogger(TradingServiceImpl.class);
-
-    private final RestTemplate restTemplate = new RestTemplate();
-
 
     @Value("${trading.pause-range}")
     private int[] pauseRange;
@@ -33,7 +27,7 @@ public class TradingServiceImpl implements TradingService{
     private AccountService accountService;
 
     @Override
-    public void trade(String symbol, String side, String quantity) {
+    public void trade(String symbol, String side, String quantity) throws NoAccountsException {
         Random random = new Random();
         List<Account> accounts = accountService.getAllAccounts();
 

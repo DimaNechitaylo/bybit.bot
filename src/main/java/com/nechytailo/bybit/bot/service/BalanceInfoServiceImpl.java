@@ -1,7 +1,7 @@
 package com.nechytailo.bybit.bot.service;
 
-import com.nechytailo.bybit.bot.model.Account;
-import com.nechytailo.bybit.bot.utils.URLs;
+import com.nechytailo.bybit.bot.entity.Account;
+import com.nechytailo.bybit.bot.exception.NoAccountsException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -9,44 +9,24 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class BalanceInfoServiceImpl implements BalanceInfoService {
     private static final Logger LOG = LoggerFactory.getLogger(BalanceInfoServiceImpl.class);
-    private static final long RECV_WINDOW = 20000;
 
-    @Value("${bybit.api.token}")
-    private String token;
-
-//    @Value("${bybit.api.threshold}")
-//    private Double threshold;
-
-    @Value("${bybit.api.accountType}")
-    private String accountType;
-
-    @Value("${bybit.api.key0}")
-    private String apiKey;
-
-    @Value("${bybit.api.secret0}")
-    private String apiSecret;
-
-//    @Value("${bybit.api.accountDelayRangeMin}")
-//    private int delayRangeMin;
-//
-//    @Value("${bybit.api.accountDelayRangeMax}")
-//    private int delayRangeMax;
+    @Value("${trading.pause-range}")
+    private int[] pauseRange;
 
     @Autowired
     private BybitApiService bybitApiService;
 
     @Autowired
-    private URLs urls;
-
-    @Autowired
     private AccountService accountService;
 
     @Override
-    public List<String> getBalances(String token) {
+    public List<String> getBalances(String token) throws NoAccountsException {
+        Random random = new Random();
         List<String> balances = new ArrayList<>();
         List<Account> accounts = accountService.getAllAccounts();
 
@@ -54,6 +34,15 @@ public class BalanceInfoServiceImpl implements BalanceInfoService {
             String balanceInfo = bybitApiService.getCoinBalance(account, token);
             balances.add(balanceInfo);
             LOG.info("Balance Info: {}", balanceInfo);
+
+            int delay = random.nextInt(pauseRange[1] - pauseRange[0]) + pauseRange[0];
+            LOG.info("Selected delay: {} seconds%n", delay);
+            try {
+                TimeUnit.SECONDS.sleep(delay);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new RuntimeException("Thread interrupted during sleep", e);
+            }
         });
         return balances;
     }

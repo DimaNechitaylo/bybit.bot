@@ -1,7 +1,7 @@
 package com.nechytailo.bybit.bot.controller;
 
-import com.nechytailo.bybit.bot.model.Account;
-import com.nechytailo.bybit.bot.model.ProxyParams;
+import com.nechytailo.bybit.bot.entity.Account;
+import com.nechytailo.bybit.bot.exception.NoAccountsException;
 import com.nechytailo.bybit.bot.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,8 +17,14 @@ public class AccountController { //TODO delete unused
     private AccountService accountService;
 
     @GetMapping
-    public ResponseEntity<List<Account>> getAllAccounts() {
-        List<Account> accounts = accountService.getAllAccounts();
+    public ResponseEntity<?> getAllAccounts() {
+        List<Account> accounts;
+        try {
+            accounts = accountService.getAllAccounts();
+        } catch (NoAccountsException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("No accounts available");
+        }
         return ResponseEntity.ok(accounts);
     }
 

@@ -1,4 +1,4 @@
-package com.nechytailo.bybit.bot.model;
+package com.nechytailo.bybit.bot.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
