@@ -28,11 +28,11 @@ public class AccountController { //TODO delete unused
         return ResponseEntity.ok(accounts);
     }
 
-    @PostMapping("/add")
-    public ResponseEntity<Account> addAccount(@RequestBody Account account) {
-        Account createdAccount = accountService.addAccount(account);
-        return new ResponseEntity<>(createdAccount, HttpStatus.CREATED);
-    }
+//    @PostMapping("/add")
+//    public ResponseEntity<Account> addAccount(@RequestBody Account account) {
+//        Account createdAccount = accountService.addAccount(account);
+//        return new ResponseEntity<>(createdAccount, HttpStatus.CREATED);
+//    }
 
 //    @GetMapping("/add2")
 //    public ResponseEntity<Account> addAccountTest() {

@@ -4,7 +4,7 @@ import com.nechytailo.bybit.bot.bot.dto.TradeEventRequestDto;
 import com.nechytailo.bybit.bot.bot.dto.TradeEventResponseDto;
 import com.nechytailo.bybit.bot.entity.EventStatus;
 import com.nechytailo.bybit.bot.entity.TradeEvent;
-import com.nechytailo.bybit.bot.mapper.EntityMapper;
+import com.nechytailo.bybit.bot.mapper.EventMapper;
 import com.nechytailo.bybit.bot.repository.EventRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,7 +16,7 @@ import java.util.List;
 public class EventService {
 
     @Autowired
-    private EntityMapper entityMapper;
+    private EventMapper eventMapper;
 
     @Autowired
     private EventRepository eventRepository;
@@ -26,9 +26,9 @@ public class EventService {
     }
 
     public TradeEventResponseDto addEvent(TradeEventRequestDto tradeEventRequestDto) {
-        TradeEvent tradeEvent = entityMapper.toEntity(tradeEventRequestDto);
+        TradeEvent tradeEvent = eventMapper.toEntity(tradeEventRequestDto);
         tradeEvent.setStatus(EventStatus.NEW);
-        return entityMapper.toResponseDto(eventRepository.save(tradeEvent));
+        return eventMapper.toResponseDto(eventRepository.save(tradeEvent));
     }
 
     public List<TradeEvent> getPendingEventsWithinTimeRange(LocalDateTime start, LocalDateTime end) {

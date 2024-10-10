@@ -1,7 +1,9 @@
 package com.nechytailo.bybit.bot.service;
 
+import com.nechytailo.bybit.bot.bot.dto.AccountDto;
 import com.nechytailo.bybit.bot.entity.Account;
 import com.nechytailo.bybit.bot.exception.NoAccountsException;
+import com.nechytailo.bybit.bot.mapper.AccountMapper;
 import com.nechytailo.bybit.bot.model.ErrorType;
 import com.nechytailo.bybit.bot.repository.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +13,9 @@ import java.util.List;
 
 @Service
 public class AccountServiceImpl implements AccountService {
+
+    @Autowired
+    private AccountMapper accountMapper;
 
     @Autowired
     AccountRepository accountRepository;
@@ -25,7 +30,8 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Account addAccount(Account account) {
-        return accountRepository.save(account);
+    public AccountDto addAccount(AccountDto accountDto) {
+        Account account = accountMapper.toEntity(accountDto);
+        return accountMapper.toDto(accountRepository.save(account));
     }
 }

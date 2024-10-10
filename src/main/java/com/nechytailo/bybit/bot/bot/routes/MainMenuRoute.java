@@ -4,6 +4,7 @@ import com.nechytailo.bybit.bot.bot.constants.MessageRoutes;
 import io.github.zhyshko.core.annotation.Message;
 import io.github.zhyshko.core.annotation.MessageMapping;
 import io.github.zhyshko.core.annotation.ViewInitializer;
+import io.github.zhyshko.core.i18n.impl.I18NLabelsWrapper;
 import io.github.zhyshko.core.response.ResponseEntity;
 import io.github.zhyshko.core.response.ResponseList;
 import io.github.zhyshko.core.router.Route;
@@ -71,11 +72,11 @@ public class MainMenuRoute implements Route {
     }
 
     @MessageMapping
-    public ResponseEntity handleAnotherMessage(@NotNull UpdateWrapper wrapper) {
+    public ResponseEntity handleAnotherMessage(@NotNull UpdateWrapper wrapper, I18NLabelsWrapper labelsWrapper) {
         LOG.debug("MainMenu handleAnotherMessage");
         SendMessage message = SendMessage.builder()
                 .chatId(wrapper.getChatId())
-                .text("MainMenu")
+                .text(labelsWrapper.getLabel("main.menu"))
                 .build();
 
         return ResponseEntity.builder()

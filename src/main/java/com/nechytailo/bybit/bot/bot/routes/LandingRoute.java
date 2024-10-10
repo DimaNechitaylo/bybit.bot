@@ -3,6 +3,7 @@ package com.nechytailo.bybit.bot.bot.routes;
 import io.github.zhyshko.core.annotation.Entrypoint;
 import io.github.zhyshko.core.annotation.Message;
 import io.github.zhyshko.core.annotation.MessageMapping;
+import io.github.zhyshko.core.constants.SessionConstants;
 import io.github.zhyshko.core.router.Route;
 import io.github.zhyshko.core.util.UpdateWrapper;
 import io.github.zhyshko.core.response.ResponseEntity;
@@ -11,6 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+
+import java.util.Locale;
 
 @Component
 @Entrypoint
@@ -22,6 +25,7 @@ public class LandingRoute implements Route {
     @MessageMapping
     public ResponseEntity handleGreeting(@NotNull UpdateWrapper wrapper) {
         LOG.debug("First route");
+        wrapper.getSession().set(SessionConstants.SESSION_LOCALE_KEY, Locale.forLanguageTag("uk"));
         SendMessage message = SendMessage.builder()
                 .chatId(wrapper.getChatId())
                 .text("Hi")

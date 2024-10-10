@@ -8,11 +8,11 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2024-10-10T12:15:10+0300",
+    date = "2024-10-10T15:39:36+0300",
     comments = "version: 1.6.2, compiler: javac, environment: Java 21.0.4 (Oracle Corporation)"
 )
 @Component
-public class EntityMapperImpl implements EntityMapper {
+public class EventMapperImpl implements EventMapper {
 
     @Override
     public TradeEvent toEntity(TradeEventRequestDto tradeEventRequestDto) {

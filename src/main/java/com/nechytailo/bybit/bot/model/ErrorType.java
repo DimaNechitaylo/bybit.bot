@@ -9,7 +9,8 @@ public enum ErrorType {
     INTERNAL_ERROR(501),
     UNKNOWN_ERROR(502),
     NO_ACCOUNTS(503),
-    INVALID_EVENT_PARAMETERS(504);
+    INVALID_EVENT_PARAMETERS(504),
+    INVALID_ACCOUNT_PARAMETERS(505);
 
     private int errorCode;
 }
