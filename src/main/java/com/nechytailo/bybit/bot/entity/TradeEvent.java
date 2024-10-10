@@ -23,4 +23,8 @@ public class TradeEvent {
     private String quantity;
     private LocalDateTime executeAt;
     private EventStatus status;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
 }

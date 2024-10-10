@@ -9,4 +9,11 @@ public class AccountDto {
     private String apiKey;
     private String apiSecret;
     private ProxyParamsDto proxyParams;
+
+    @Override
+    public String toString() {
+        return "apiKey='" + apiKey + '\'' +
+                ", apiSecret='" + apiSecret + '\'' +
+                ", proxyParams=" + proxyParams;
+    }
 }

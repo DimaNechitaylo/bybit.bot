@@ -9,25 +9,24 @@ import org.mapstruct.Named;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface EventMapper {
 
     DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    // Методы маппинга для DTO в Entity
-    @Mapping(source = "executeAt", target = "executeAt", qualifiedByName = "stringToLocalDateTime")
+    @Mapping(source = "executeAt", target = "executeAt", qualifiedByName = "stringToLocalDateTime") //TODO maybe delete
     TradeEvent toEntity(TradeEventRequestDto tradeEventRequestDto);
 
-    // Методы маппинга для Entity в ResponseDTO
     @Mapping(source = "executeAt", target = "executeAt", qualifiedByName = "localDateTimeToString")
     TradeEventResponseDto toResponseDto(TradeEvent tradeEvent);
 
-    // Методы маппинга для Entity в RequestDTO
     @Mapping(source = "executeAt", target = "executeAt", qualifiedByName = "localDateTimeToString")
     TradeEventRequestDto toRequestDto(TradeEvent tradeEvent);
 
-    // Кастомные методы преобразования
+    List<TradeEventResponseDto> toResponseDtoList(List<TradeEvent> tradeEvents);
+
     @Named("stringToLocalDateTime")
     default LocalDateTime stringToLocalDateTime(String date) {
         return LocalDateTime.parse(date, FORMATTER);

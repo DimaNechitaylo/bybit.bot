@@ -4,12 +4,14 @@ import com.nechytailo.bybit.bot.bot.dto.AccountDto;
 import com.nechytailo.bybit.bot.bot.dto.ProxyParamsDto;
 import com.nechytailo.bybit.bot.entity.Account;
 import com.nechytailo.bybit.bot.entity.ProxyParams;
+import java.util.ArrayList;
+import java.util.List;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2024-10-10T15:39:36+0300",
+    date = "2024-10-10T21:12:12+0300",
     comments = "version: 1.6.2, compiler: javac, environment: Java 21.0.4 (Oracle Corporation)"
 )
 @Component
@@ -43,6 +45,20 @@ public class AccountMapperImpl implements AccountMapper {
         accountDto.proxyParams( proxyParamsToProxyParamsDto( account.getProxyParams() ) );
 
         return accountDto.build();
+    }
+
+    @Override
+    public List<AccountDto> toResponseDtoList(List<Account> byUserId) {
+        if ( byUserId == null ) {
+            return null;
+        }
+
+        List<AccountDto> list = new ArrayList<AccountDto>( byUserId.size() );
+        for ( Account account : byUserId ) {
+            list.add( toDto( account ) );
+        }
+
+        return list;
     }
 
     protected ProxyParams proxyParamsDtoToProxyParams(ProxyParamsDto proxyParamsDto) {

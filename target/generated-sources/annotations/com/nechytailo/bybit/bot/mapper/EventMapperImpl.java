@@ -3,12 +3,14 @@ package com.nechytailo.bybit.bot.mapper;
 import com.nechytailo.bybit.bot.bot.dto.TradeEventRequestDto;
 import com.nechytailo.bybit.bot.bot.dto.TradeEventResponseDto;
 import com.nechytailo.bybit.bot.entity.TradeEvent;
+import java.util.ArrayList;
+import java.util.List;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2024-10-10T15:39:36+0300",
+    date = "2024-10-10T20:25:31+0300",
     comments = "version: 1.6.2, compiler: javac, environment: Java 21.0.4 (Oracle Corporation)"
 )
 @Component
@@ -66,5 +68,19 @@ public class EventMapperImpl implements EventMapper {
         tradeEventRequestDto.quantity( tradeEvent.getQuantity() );
 
         return tradeEventRequestDto.build();
+    }
+
+    @Override
+    public List<TradeEventResponseDto> toResponseDtoList(List<TradeEvent> tradeEvents) {
+        if ( tradeEvents == null ) {
+            return null;
+        }
+
+        List<TradeEventResponseDto> list = new ArrayList<TradeEventResponseDto>( tradeEvents.size() );
+        for ( TradeEvent tradeEvent : tradeEvents ) {
+            list.add( toResponseDto( tradeEvent ) );
+        }
+
+        return list;
     }
 }

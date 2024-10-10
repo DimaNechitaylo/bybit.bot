@@ -40,15 +40,15 @@ public class EventScheduler {
         return Duration.ofMinutes(lookAheadTime);
     }
 
-    @Scheduled(fixedRate = 10000) // 10 sec
+    @Scheduled(fixedRate = 100000) // 100 sec
     public void scheduleUpcomingEvents() {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime lookAheadTime = now.plus(getLookAheadDuration());
 
-        List<TradeEvent> tradeEvents = eventService.getPendingEventsWithinTimeRange(now, lookAheadTime);
+        List<TradeEvent> tradeEvents = eventService.getNewEventsWithinTimeRangeByUserid(now, lookAheadTime);
 
         for (TradeEvent tradeEvent : tradeEvents) {
-            Instant executeAtInstant = convertToInstant(tradeEvent.getExecuteAt()); // Преобразование LocalDateTime в Instant
+            Instant executeAtInstant = convertToInstant(tradeEvent.getExecuteAt());
             taskScheduler.schedule(() -> executeEvent(tradeEvent), executeAtInstant);
             eventService.updateEventStatus(tradeEvent, EventStatus.PENDING);
         }

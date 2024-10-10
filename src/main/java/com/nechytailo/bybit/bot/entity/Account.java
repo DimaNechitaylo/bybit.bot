@@ -20,4 +20,8 @@ public class Account {
     @OneToOne(cascade = CascadeType.ALL) //TODO check it
     @JoinColumn(name = "proxy_params_id")
     private ProxyParams proxyParams;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
 }

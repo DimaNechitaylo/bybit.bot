@@ -54,24 +54,26 @@ public class AddEventRoute implements Route {
     @MessageMapping
     public ResponseEntity handleAddEvent(@NotNull UpdateWrapper wrapper) {
         String messageText = wrapper.getUpdate().getMessage().getText();
+        Long userId = wrapper.getUserId();
+        Long chatId = wrapper.getChatId();
         LOG.debug("AddEventRoute route message: {}", messageText);
         SendMessage message;
         try {
             TradeEventRequestDto tradeEventRequestDto = eventValidator.processTradeEvent(messageText);
-            bybitService.addEvent(tradeEventRequestDto);
+            bybitService.addEvent(tradeEventRequestDto, userId);
             message = SendMessage.builder()
-                    .chatId(wrapper.getChatId())
+                    .chatId(chatId)
                     .text("Event " + messageText + " added")
                     .build();
         } catch (GeneralServiceException e) {
             message = SendMessage.builder()
-                    .chatId(wrapper.getChatId())
+                    .chatId(chatId)
                     .text("Error: " + e.getErrorType().getErrorCode() + " " + e.getMessage())
                     .build();
         } catch (Exception ex) { //TODO
             ex.printStackTrace();
             message = SendMessage.builder()
-                    .chatId(wrapper.getChatId())
+                    .chatId(chatId)
                     .text("Error "+ex.getMessage())
                     .build();
         }

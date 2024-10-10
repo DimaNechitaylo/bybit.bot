@@ -14,4 +14,14 @@ public class TradeEventResponseDto {
     private String executeAt;
     private String status;
 
+    @Override
+    public String toString() {
+        return String.format("Event %s, symbol=%s, side=%s, quantity=%s, executeAt=%s, status=%s",
+                description,
+                symbol,
+                side,
+                quantity,
+                executeAt,
+                status);
+    }
 }

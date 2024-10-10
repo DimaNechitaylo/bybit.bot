@@ -44,7 +44,7 @@ public class AddAccountRoute implements Route {
         SendMessage message = SendMessage.builder()
                 .chatId(wrapper.getChatId())
                 .replyMarkup(replyKeyboardMarkup)
-                .text("Send event data in the required format:\n API key, API secret, proxy host, proxy port, proxy login, proxy password.\n Example:\n VlaWGp7YMTGc3VdQQg, xCKd81GVT8Z5Du2FZMcPhYaQJSKdHIo3gpwX, 181.3.213.31, 8080, login, pass")
+                .text("Send event data in the required format:\n API key, API secret, proxy host, proxy port, proxy login, proxy password.\n\n Example:\n VlaWGp7YMTGc3VdQQg, xCKd81GVT8Z5Du2FZMcPhYaQJSKdHIo3gpwX, 181.3.213.31, 8080, login, pass")
                 .build();
         return ResponseList.builder()
                 .response(message)
@@ -55,25 +55,27 @@ public class AddAccountRoute implements Route {
     public ResponseEntity handleGreeting(@NotNull UpdateWrapper wrapper) {
         String messageText = wrapper.getUpdate().getMessage().getText();
         LOG.debug("AddAccountRoute route message: {}", messageText);
-        LOG.debug("++++++++++++++++++++++++++ save new account");
+        Long userId = wrapper.getUserId();
+        Long chatId = wrapper.getChatId();
+
         SendMessage message;
         try {
             AccountDto accountDto = accountValidator.processAccount(messageText);
-            bybitService.addAccount(accountDto);
+            bybitService.addAccount(accountDto, userId);
 
             message = SendMessage.builder()
-                    .chatId(wrapper.getChatId())
+                    .chatId(chatId)
                     .text("Account " + messageText + " added")
                     .build();
         } catch (GeneralServiceException e) {
             message = SendMessage.builder()
-                    .chatId(wrapper.getChatId())
+                    .chatId(chatId)
                     .text("Error: " + e.getErrorType().getErrorCode() + " " + e.getMessage())
                     .build();
         } catch (Exception ex) { //TODO
             ex.printStackTrace();
             message = SendMessage.builder()
-                    .chatId(wrapper.getChatId())
+                    .chatId(chatId)
                     .text("Error "+ex.getMessage())
                     .build();
         }
