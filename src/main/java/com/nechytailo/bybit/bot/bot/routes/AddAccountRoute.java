@@ -91,7 +91,7 @@ public class AddAccountRoute implements Route {
 
         SendMessage message = SendMessage.builder()
                 .chatId(wrapper.getChatId())
-                .text("Main menu from AddAccountRoute")
+                .text("Main menu from add account")
                 .build();
 
         return ResponseEntity.builder()

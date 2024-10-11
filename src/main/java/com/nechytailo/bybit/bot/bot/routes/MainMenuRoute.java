@@ -43,14 +43,16 @@ public class MainMenuRoute implements Route {
     public ResponseList initView(UpdateWrapper wrapper) {
         ReplyKeyboardMarkup inlineKeyboardMarkup = ReplyKeyboardMarkup.builder()
                 .keyboardRow(new KeyboardRow(KeyboardButton.builder().text(MessageRoutes.ADD_ACCOUNT).build(),
-                        KeyboardButton.builder().text(MessageRoutes.ADD_EVENT).build(),
-                        KeyboardButton.builder().text(MessageRoutes.GET_USER_ACCOUNTS).build(),
-                        KeyboardButton.builder().text(MessageRoutes.GET_USER_EVENTS).build()))
-                        .build();
+                        KeyboardButton.builder().text(MessageRoutes.ADD_EVENT).build())
+                )
+                .keyboardRow(new KeyboardRow(KeyboardButton.builder().text(MessageRoutes.GET_USER_ACCOUNTS).build(),
+                        KeyboardButton.builder().text(MessageRoutes.GET_USER_EVENTS).build())
+                )
+                .build();
         SendMessage message = SendMessage.builder()
                 .chatId(wrapper.getChatId())
                 .replyMarkup(inlineKeyboardMarkup)
-                .text("ViewInitializer MainMenuRoute")
+                .text("Main menu")
                 .build();
         return ResponseList.builder()
                 .response(message)
@@ -62,7 +64,7 @@ public class MainMenuRoute implements Route {
         LOG.debug("MainMenu handleTest1");
         SendMessage message = SendMessage.builder()
                 .chatId(wrapper.getChatId())
-                .text("fill ACCOUNT data")
+                .text("Fill account data")
                 .build();
 
         return ResponseEntity.builder()
@@ -76,7 +78,7 @@ public class MainMenuRoute implements Route {
         LOG.debug("MainMenu handleTest2");
         SendMessage message = SendMessage.builder()
                 .chatId(wrapper.getChatId())
-                .text("fill event data")
+                .text("Fill event data")
                 .build();
 
         return ResponseEntity.builder()
@@ -95,7 +97,7 @@ public class MainMenuRoute implements Route {
         try {
             userEventsStr = bybitService.getUserEvents(userId).stream()
                     .map(TradeEventResponseDto::toString)
-                    .collect(Collectors.joining("\n"));
+                    .collect(Collectors.joining("\n\n"));
             message = SendMessage.builder()
                     .chatId(chatId)
                     .text("Your events:\n\n" + userEventsStr)
@@ -130,7 +132,7 @@ public class MainMenuRoute implements Route {
         try {
             userAccountsStr = bybitService.getUserAccounts(userId).stream()
                     .map(AccountDto::toString)
-                    .collect(Collectors.joining("\n"));
+                    .collect(Collectors.joining("\n\n"));
 
             message = SendMessage.builder()
                     .chatId(wrapper.getChatId())

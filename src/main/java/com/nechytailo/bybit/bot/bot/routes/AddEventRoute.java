@@ -90,7 +90,7 @@ public class AddEventRoute implements Route {
 
         SendMessage message = SendMessage.builder()
                 .chatId(wrapper.getChatId())
-                .text("Main menu from AddEventRoute")
+                .text("Main menu from add event")
                 .build();
 
         return ResponseEntity.builder()
