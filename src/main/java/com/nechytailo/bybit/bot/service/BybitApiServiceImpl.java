@@ -1,9 +1,11 @@
 package com.nechytailo.bybit.bot.service;
 
 import com.google.gson.Gson;
+import com.nechytailo.bybit.bot.dto.GetBalanceResponseDto;
 import com.nechytailo.bybit.bot.dto.ServerTimeDto;
 import com.nechytailo.bybit.bot.factory.ProxyRequestService;
 import com.nechytailo.bybit.bot.entity.Account;
+import com.nechytailo.bybit.bot.model.TradeSide;
 import com.nechytailo.bybit.bot.utils.URLs;
 import com.nechytailo.bybit.bot.utils.UniqueOrderLinkIdGenerator;
 import org.slf4j.Logger;
@@ -17,6 +19,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,8 +44,13 @@ public class BybitApiServiceImpl implements BybitApiService {
     @Autowired
     private ProxyRequestService proxyRequestService;
 
+    @Autowired
+    private DelayService delayService;
+
     @Override
-    public void placeMarketOrder(Account account, String symbol, String side, String quantity) {
+    public void placeMarketOrderWithQty(Account account, String symbol, String side, String quantity) {
+        long startMethodTime = System.currentTimeMillis();
+
         RestTemplate restTemplate = proxyRequestService.createRestTemplateWithProxy(account.getProxyParams()); //TODO account == null
         String timestamp = String.valueOf(getServerTime(restTemplate));
 
@@ -65,10 +74,11 @@ public class BybitApiServiceImpl implements BybitApiService {
         headers.set("X-BAPI-RECV-WINDOW", recvWindow);
         headers.set("Content-Type", "application/json");
 
-        long startTime = System.currentTimeMillis();
+        long startResponseTime = System.currentTimeMillis();
         ResponseEntity<String> response = restTemplate.postForEntity(url, new HttpEntity<>(paramsJson, headers), String.class);
         long endTime = System.currentTimeMillis();
-        LOG.debug("Processing time: {}", (endTime - startTime));
+        LOG.debug("Processing placeMarketOrder method time: {}", (endTime - startMethodTime));
+        LOG.debug("Processing placeMarketOrder request time: {}", (endTime - startResponseTime));
         LOG.debug("Response: {}", response);
         if (!response.getStatusCode().is2xxSuccessful()) {
             throw new RuntimeException("Error placing order: " + response.getStatusCode());
@@ -76,7 +86,24 @@ public class BybitApiServiceImpl implements BybitApiService {
     }
 
     @Override
-    public String getCoinBalance(Account account, String token) {
+    public void instantTrade(Account account, String coinToBuy, String coinForBuy) { // coinForBuy = USDT
+        long startMethodTime = System.currentTimeMillis();
+        GetBalanceResponseDto getBalanceCoinForBuyResponseDto = getCoinBalance(account, coinForBuy);
+        String coinForBuyBalance = roundToDecimal(getBalanceCoinForBuyResponseDto.getResult().getBalance().getWalletBalance());
+        placeMarketOrderWithQty(account, coinToBuy+coinForBuy, TradeSide.BUY.toString(), coinForBuyBalance);
+
+        delayService.doHoldDelay();
+
+        GetBalanceResponseDto getBalanceCoinToBuyResponseDto = getCoinBalance(account, coinToBuy);
+        String coinToBuyBalance = roundToDecimal(getBalanceCoinToBuyResponseDto.getResult().getBalance().getWalletBalance());
+        placeMarketOrderWithQty(account, coinToBuy+coinForBuy, TradeSide.SELL.toString(), coinToBuyBalance);
+        long endTime = System.currentTimeMillis();
+        LOG.debug("Processing instantTrade method time: {}", (endTime - startMethodTime));
+    }
+
+    @Override
+    public GetBalanceResponseDto getCoinBalance(Account account, String token) {
+        long startMethodTime = System.currentTimeMillis();
         RestTemplate restTemplate = proxyRequestService.createRestTemplateWithProxy(account.getProxyParams()); //TODO account == null
         String timestamp = String.valueOf(getServerTime(restTemplate));
         Map<String, Object> params = new HashMap<>();
@@ -86,20 +113,23 @@ public class BybitApiServiceImpl implements BybitApiService {
 
         String url = urls.getCoinBalanceUrl(accountType, token);
 
-        try {
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("X-BAPI-API-KEY", account.getApiKey());
-            headers.set("X-BAPI-SIGN", signature);
-            headers.set("X-BAPI-TIMESTAMP", timestamp);
-            headers.set("X-BAPI-RECV-WINDOW", recvWindow);
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("X-BAPI-API-KEY", account.getApiKey());
+        headers.set("X-BAPI-SIGN", signature);
+        headers.set("X-BAPI-TIMESTAMP", timestamp);
+        headers.set("X-BAPI-RECV-WINDOW", recvWindow);
 
-            HttpEntity<String> entity = new HttpEntity<>(headers);
-            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
-            LOG.debug("Response: {}", response);
-            return response.getBody();
-        } catch (Exception e) {
-            return "Error retrieving balance for account "; //TODO
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+        long startResponseTime = System.currentTimeMillis();
+        ResponseEntity<GetBalanceResponseDto> response = restTemplate.exchange(url, HttpMethod.GET, entity, GetBalanceResponseDto.class);
+        long endTime = System.currentTimeMillis();
+        LOG.debug("Processing getCoinBalance method time: {}", (endTime - startMethodTime));
+        LOG.debug("Processing getCoinBalance request time: {}", (endTime - startResponseTime));
+        LOG.debug("Response: {}", response);
+        if (!response.getStatusCode().is2xxSuccessful()) {
+            throw new RuntimeException("Error getting balance: " + response.getStatusCode()); //TODO add new exception
         }
+        return response.getBody();
     }
 
     public Long getServerTime(RestTemplate restTemplate) {
@@ -114,6 +144,12 @@ public class BybitApiServiceImpl implements BybitApiService {
             e.printStackTrace(); //TODO
         }
         return null; //TODO
+    }
+
+    private String roundToDecimal(String qty) {
+        BigDecimal number = new BigDecimal(qty);
+        BigDecimal roundedNumber = number.setScale(5, RoundingMode.DOWN);
+        return roundedNumber.toPlainString();
     }
 
 }

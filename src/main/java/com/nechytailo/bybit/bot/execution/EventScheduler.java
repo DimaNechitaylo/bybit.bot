@@ -36,6 +36,9 @@ public class EventScheduler {
     @Autowired
     private ThreadPoolTaskScheduler taskScheduler;
 
+    @Autowired
+    private EventExecutor eventExecutor;
+
     private Duration getLookAheadDuration() {
         return Duration.ofMinutes(lookAheadTime);
     }
@@ -49,35 +52,22 @@ public class EventScheduler {
 
         for (TradeEvent tradeEvent : tradeEvents) {
             Instant executeAtInstant = convertToInstant(tradeEvent.getExecuteAt());
-            taskScheduler.schedule(() -> executeEvent(tradeEvent), executeAtInstant);
+            taskScheduler.schedule(() -> eventExecutor.executeTradeEvent(tradeEvent), executeAtInstant);
             eventService.updateEventStatus(tradeEvent, EventStatus.PENDING);
         }
 
         logEventsToSchedule(tradeEvents);
     }
 
-    private void executeEvent(TradeEvent tradeEvent) {
-        try {
-            LocalDateTime now = LocalDateTime.now();
-            tradingService.trade(tradeEvent.getSymbol(), tradeEvent.getSide(), tradeEvent.getQuantity());
-            LOG.info("Executing event at: {}, scheduled for: {}", now, tradeEvent.getExecuteAt());
-            eventService.updateEventStatus(tradeEvent, EventStatus.COMPLETED);
-        } catch (Exception e) {
-            LOG.error("Executing event failed at: {}, scheduled for: {}. Error message: {}, Exception:{}",
-                    LocalDateTime.now(), tradeEvent.getExecuteAt(), e.getMessage(), e.getStackTrace());
-            eventService.updateEventStatus(tradeEvent, EventStatus.FAILED);
-        }
-    }
-
-    private Instant  convertToInstant(LocalDateTime dateTime) {
+    private Instant convertToInstant(LocalDateTime dateTime) {
         return dateTime.atZone(ZoneId.systemDefault()).toInstant();
     }
 
     private void logEventsToSchedule(List<TradeEvent> tradeEvents){
         if (!tradeEvents.isEmpty()) {
             String eventDetails = tradeEvents.stream()
-                    .map(tradeEvent -> String.format("Event[id=%d, description='%s', executeAt=%s, status=%s]",
-                            tradeEvent.getId(), tradeEvent.getDescription(), tradeEvent.getExecuteAt(), tradeEvent.getStatus()))
+                    .map(tradeEvent -> String.format("Event[id=%d, name='%s', executeAt=%s, status=%s]",
+                            tradeEvent.getId(), tradeEvent.getName(), tradeEvent.getExecuteAt(), tradeEvent.getStatus()))
                     .collect(Collectors.joining(", "));
 
             LOG.debug("Events to schedule: {}", eventDetails);

@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 @Component
 public class EventValidator {
-    private static final String TRADE_EVENT_REGEX = "^(.*?),\\s([A-Z]{2,10}),\\s(BUY|SELL),\\s(\\d+),\\s(\\d{4}-\\d{2}-\\d{2}\\s\\d{2}:\\d{2}:\\d{2})$";
+    private static final String TRADE_EVENT_REGEX = "^([A-Za-z0-9]+),([A-Z]{3,5}),([A-Z]{3,5}),(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2})$";
     private static final Pattern TRADE_EVENT_PATTERN = Pattern.compile(TRADE_EVENT_REGEX);
 
     public TradeEventRequestDto processTradeEvent(String input) throws InvalidEventArgumentException {
@@ -20,11 +20,10 @@ public class EventValidator {
         }
 
         return TradeEventRequestDto.builder()
-                .description(matcher.group(1))
-                .symbol(matcher.group(2))
-                .side(matcher.group(3))
-                .quantity(matcher.group(4))
-                .executeAt(matcher.group(5))
+                .name(matcher.group(1))
+                .firstSymbol(matcher.group(2))
+                .secondSymbol(matcher.group(3))
+                .executeAt(matcher.group(4))
                 .build();
     }
 }

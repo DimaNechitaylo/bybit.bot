@@ -2,7 +2,6 @@ package com.nechytailo.bybit.bot.bot.routes;
 
 import com.nechytailo.bybit.bot.bot.constants.MessageRoutes;
 import com.nechytailo.bybit.bot.bot.dto.TradeEventRequestDto;
-import com.nechytailo.bybit.bot.bot.exception.InvalidEventArgumentException;
 import com.nechytailo.bybit.bot.bot.service.impl.BybitServiceImpl;
 import com.nechytailo.bybit.bot.bot.validation.EventValidator;
 import com.nechytailo.bybit.bot.exception.GeneralServiceException;
@@ -25,9 +24,9 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 
 @Component
 @Message
-public class AddEventRoute implements Route {
+public class AddTradeEventRoute implements Route {
 
-    private static final Logger LOG = LoggerFactory.getLogger(AddEventRoute.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AddTradeEventRoute.class);
 
     @Autowired
     private EventValidator eventValidator;

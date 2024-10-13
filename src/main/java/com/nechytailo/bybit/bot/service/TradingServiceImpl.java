@@ -10,15 +10,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 @Service
 public class TradingServiceImpl implements TradingService{
 
     private static final Logger LOG = LoggerFactory.getLogger(TradingServiceImpl.class);
-
-    @Value("${trading.pause-range}")
-    private int[] pauseRange;
 
     @Autowired
     private BybitApiService bybitApiService;
@@ -26,22 +22,28 @@ public class TradingServiceImpl implements TradingService{
     @Autowired
     private AccountService accountService;
 
+    @Autowired
+    private DelayService delayService;
+
     @Override
-    public void trade(String symbol, String side, String quantity) throws NoAccountsException {
-        Random random = new Random();
+    public void buy(String symbol, String side, String quantity) throws NoAccountsException {
         List<Account> accounts = accountService.getAllAccounts();
 
         accounts.forEach((account) -> { //TODO проверка на повторение аккаунтов. (может юзaть Set)
-            bybitApiService.placeMarketOrder(account, symbol, side, quantity);
+            bybitApiService.placeMarketOrderWithQty(account, symbol, side, quantity);
 
-            int delay = random.nextInt(pauseRange[1] - pauseRange[0]) + pauseRange[0];
-            LOG.info("Selected delay: {} seconds%n", delay);
-            try {
-                TimeUnit.SECONDS.sleep(delay);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                throw new RuntimeException("Thread interrupted during sleep", e);
-            }
+            delayService.doAccountTradeDelay();
+        });
+
+    }
+
+    @Override
+    public void trade(String coinToBuy, String coinForBuy) throws NoAccountsException {
+        List<Account> accounts = accountService.getAllAccounts();
+
+        accounts.forEach((account) -> { //TODO проверка на повторение аккаунтов. (может юзaть Set)
+            bybitApiService.instantTrade(account, coinToBuy, coinForBuy);
+            delayService.doAccountTradeDelay();
         });
 
     }

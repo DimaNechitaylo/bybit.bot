@@ -11,8 +11,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name="events")
-public class TradeEvent {
+@Table(name="buy_events")
+public class BuyEvent {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -22,6 +22,7 @@ public class TradeEvent {
     private String side;
     private String quantity;
     private LocalDateTime executeAt;
+    private LocalDateTime executedAt;
     private EventStatus status;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)

@@ -1,6 +1,6 @@
 package com.nechytailo.bybit.bot.controller;
 
-import com.nechytailo.bybit.bot.entity.Account;
+import com.nechytailo.bybit.bot.dto.GetBalanceResponseDto;
 import com.nechytailo.bybit.bot.exception.NoAccountsException;
 import com.nechytailo.bybit.bot.service.BalanceInfoService;
 import com.nechytailo.bybit.bot.service.TradingService;
@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 public class HealthCheckController {
@@ -26,10 +26,21 @@ public class HealthCheckController {
         return "Application is up and running!";
     }
 
+    @GetMapping("/buy")
+    public ResponseEntity<?> buy() {
+        try {
+            tradingService.buy("BTCUSDT", "SELL", "0.003");
+        } catch (NoAccountsException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("No accounts available");
+        }
+        return ResponseEntity.ok("traded");
+    }
+
     @GetMapping("/trade")
     public ResponseEntity<?> trade() {
         try {
-            tradingService.trade("BTCUSDT", "BUY", "50");
+            tradingService.trade("BTC", "USDT");
         } catch (NoAccountsException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body("No accounts available");
@@ -39,9 +50,11 @@ public class HealthCheckController {
 
     @GetMapping("/asset")
     public ResponseEntity<?> getAsset() {
-        List<String> assets;
+        String assets;
         try {
-            assets = balanceInfoService.getBalances("USDT");
+            assets = balanceInfoService.getBalances("USDT").stream()
+                    .map(GetBalanceResponseDto::toString)
+                    .collect(Collectors.joining("<br><br>"));;
         } catch (NoAccountsException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body("No accounts available");

@@ -1,17 +1,15 @@
 package com.nechytailo.bybit.bot.service;
 
-import com.nechytailo.bybit.bot.bot.dto.AccountDto;
 import com.nechytailo.bybit.bot.bot.dto.TradeEventRequestDto;
 import com.nechytailo.bybit.bot.bot.dto.TradeEventResponseDto;
 import com.nechytailo.bybit.bot.bot.exception.UserNotFoundException;
 import com.nechytailo.bybit.bot.entity.EventStatus;
 import com.nechytailo.bybit.bot.entity.TradeEvent;
 import com.nechytailo.bybit.bot.entity.User;
-import com.nechytailo.bybit.bot.exception.NoAccountsException;
 import com.nechytailo.bybit.bot.exception.NoTradeEventException;
 import com.nechytailo.bybit.bot.mapper.EventMapper;
 import com.nechytailo.bybit.bot.model.ErrorType;
-import com.nechytailo.bybit.bot.repository.EventRepository;
+import com.nechytailo.bybit.bot.repository.TradeEventRepository;
 import com.nechytailo.bybit.bot.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,7 +24,7 @@ public class EventService {
     private EventMapper eventMapper;
 
     @Autowired
-    private EventRepository eventRepository;
+    private TradeEventRepository tradeEventRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -41,16 +39,16 @@ public class EventService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found", ErrorType.USER_NOT_FOUND));
         tradeEvent.setUser(user);
-        return eventMapper.toResponseDto(eventRepository.save(tradeEvent));
+        return eventMapper.toResponseDto(tradeEventRepository.save(tradeEvent));
     }
 
     public List<TradeEvent> getNewEventsWithinTimeRangeByUserid(LocalDateTime start, LocalDateTime end) {
-        return eventRepository.findByStatusAndExecuteAtBetween(EventStatus.NEW, start, end);
+        return tradeEventRepository.findByStatusAndExecuteAtBetween(EventStatus.NEW, start, end);
     }
 
     public List<TradeEventResponseDto> getEventsByUserIdWithPendingAndNewStatus(Long userId) throws NoTradeEventException {
         List<TradeEventResponseDto> responseDtoList = eventMapper.toResponseDtoList(
-                eventRepository.findByUserIdAndStatusIn(userId, List.of(EventStatus.PENDING, EventStatus.NEW))
+                tradeEventRepository.findByUserIdAndStatusIn(userId, List.of(EventStatus.PENDING, EventStatus.NEW))
         );
         return responseDtoList.stream()
                 .findAny()
@@ -60,7 +58,7 @@ public class EventService {
 
     public void updateEventStatus(TradeEvent tradeEvent, EventStatus status) {
         tradeEvent.setStatus(status);
-        eventRepository.save(tradeEvent);
+        tradeEventRepository.save(tradeEvent);
     }
 
 }

@@ -5,8 +5,6 @@ import com.nechytailo.bybit.bot.bot.dto.AccountDto;
 import com.nechytailo.bybit.bot.bot.dto.TradeEventResponseDto;
 import com.nechytailo.bybit.bot.bot.service.BybitService;
 import com.nechytailo.bybit.bot.exception.GeneralServiceException;
-import com.nechytailo.bybit.bot.exception.NoAccountsException;
-import com.nechytailo.bybit.bot.exception.NoTradeEventException;
 import io.github.zhyshko.core.annotation.Message;
 import io.github.zhyshko.core.annotation.MessageMapping;
 import io.github.zhyshko.core.annotation.ViewInitializer;
@@ -21,10 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardRow;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 
@@ -83,7 +78,7 @@ public class MainMenuRoute implements Route {
 
         return ResponseEntity.builder()
                 .response(message)
-                .nextRoute(AddEventRoute.class)
+                .nextRoute(AddTradeEventRoute.class)
                 .build();
     }
 

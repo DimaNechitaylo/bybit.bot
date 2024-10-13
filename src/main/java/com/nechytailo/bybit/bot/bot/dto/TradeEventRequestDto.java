@@ -9,10 +9,9 @@ import lombok.ToString;
 @ToString
 public class TradeEventRequestDto {
 
-    private String description;
-    private String symbol;
-    private String side;
-    private String quantity;
+    private String name;
+    private String firstSymbol;
+    private String secondSymbol;
     private String executeAt;
 
 }
