@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2024-10-10T21:12:12+0300",
+    date = "2024-10-14T00:27:50+0300",
     comments = "version: 1.6.2, compiler: javac, environment: Java 21.0.4 (Oracle Corporation)"
 )
 @Component
@@ -56,6 +56,20 @@ public class AccountMapperImpl implements AccountMapper {
         List<AccountDto> list = new ArrayList<AccountDto>( byUserId.size() );
         for ( Account account : byUserId ) {
             list.add( toDto( account ) );
+        }
+
+        return list;
+    }
+
+    @Override
+    public List<Account> toEntityList(List<AccountDto> accountDtos) {
+        if ( accountDtos == null ) {
+            return null;
+        }
+
+        List<Account> list = new ArrayList<Account>( accountDtos.size() );
+        for ( AccountDto accountDto : accountDtos ) {
+            list.add( toEntity( accountDto ) );
         }
 
         return list;

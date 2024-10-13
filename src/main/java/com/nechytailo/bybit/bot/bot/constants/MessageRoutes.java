@@ -11,4 +11,5 @@ public class MessageRoutes {
     public static final String ADD_EVENT = "Add event";
     public static final String GET_USER_ACCOUNTS = "Get accounts";
     public static final String GET_USER_EVENTS = "Get events";
+    public static final String GET_USER_BALANCES = "Get balances";
 }

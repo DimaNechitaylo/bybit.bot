@@ -1,6 +1,7 @@
 package com.nechytailo.bybit.bot.controller;
 
-import com.nechytailo.bybit.bot.dto.GetBalanceResponseDto;
+import com.nechytailo.bybit.bot.dto.GetAccountBalanceResponseDto;
+import com.nechytailo.bybit.bot.dto.GetCoinBalanceResponseDto;
 import com.nechytailo.bybit.bot.exception.NoAccountsException;
 import com.nechytailo.bybit.bot.service.BalanceInfoService;
 import com.nechytailo.bybit.bot.service.TradingService;
@@ -52,8 +53,8 @@ public class HealthCheckController {
     public ResponseEntity<?> getAsset() {
         String assets;
         try {
-            assets = balanceInfoService.getBalances("USDT").stream()
-                    .map(GetBalanceResponseDto::toString)
+            assets = balanceInfoService.getCoinBalances("USDT").stream()
+                    .map(GetCoinBalanceResponseDto::toString)
                     .collect(Collectors.joining("<br><br>"));;
         } catch (NoAccountsException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -61,5 +62,18 @@ public class HealthCheckController {
         }
         return ResponseEntity.ok(assets);
     }
+//    @GetMapping("/wallet-balance")
+//    public ResponseEntity<?> getWalletBalance() {
+//        String assets;
+//        try {
+//            assets = balanceInfoService.getBalances().stream()
+//                    .map(GetAccountBalanceResponseDto::toString)
+//                    .collect(Collectors.joining("<br><br>"));;
+//        } catch (NoAccountsException e) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+//                    .body("No accounts available");
+//        }
+//        return ResponseEntity.ok(assets);
+//    }
 
 }

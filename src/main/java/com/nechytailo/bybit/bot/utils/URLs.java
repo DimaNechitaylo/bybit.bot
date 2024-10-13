@@ -15,22 +15,25 @@ public class URLs {
 
     @Value("${bybit.url:https://api.bybit.com}")
     private String BYBIT_URL;
-
     private String systemTimeUrl;
-
     private String coinBalanceUrl;
-
     private String createOrderUrl;
+    private String accountBalancesUrl;
 
     @PostConstruct
     public void init() {
         this.systemTimeUrl = BYBIT_URL + byBitEndpoints.getSystemTimeEndpoint();
         this.coinBalanceUrl = BYBIT_URL + byBitEndpoints.getCoinBalanceEndpoint();
         this.createOrderUrl = BYBIT_URL + byBitEndpoints.getCreateOrderEndpoint();
+        this.accountBalancesUrl = BYBIT_URL + byBitEndpoints.getAccountBalancesEndpoint();
     }
 
     public String getCoinBalanceUrl(String accountType, String token) {
         return coinBalanceUrl + "?" + "accountType=" + accountType + "&coin=" + token;
+    }
+
+    public String getAccountBalancesUrl(String accountType) {
+        return accountBalancesUrl + "?" + "accountType=" + accountType;
     }
 
 }

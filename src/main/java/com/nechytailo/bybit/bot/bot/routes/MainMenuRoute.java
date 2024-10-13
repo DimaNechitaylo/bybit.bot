@@ -2,6 +2,7 @@ package com.nechytailo.bybit.bot.bot.routes;
 
 import com.nechytailo.bybit.bot.bot.constants.MessageRoutes;
 import com.nechytailo.bybit.bot.bot.dto.AccountDto;
+import com.nechytailo.bybit.bot.bot.dto.AccountBalanceDto;
 import com.nechytailo.bybit.bot.bot.dto.TradeEventResponseDto;
 import com.nechytailo.bybit.bot.bot.service.BybitService;
 import com.nechytailo.bybit.bot.exception.GeneralServiceException;
@@ -43,6 +44,7 @@ public class MainMenuRoute implements Route {
                 .keyboardRow(new KeyboardRow(KeyboardButton.builder().text(MessageRoutes.GET_USER_ACCOUNTS).build(),
                         KeyboardButton.builder().text(MessageRoutes.GET_USER_EVENTS).build())
                 )
+                .keyboardRow(new KeyboardRow(KeyboardButton.builder().text(MessageRoutes.GET_USER_BALANCES).build()))
                 .build();
         SendMessage message = SendMessage.builder()
                 .chatId(wrapper.getChatId())
@@ -106,10 +108,9 @@ public class MainMenuRoute implements Route {
             ex.printStackTrace();
             message = SendMessage.builder()
                     .chatId(chatId)
-                    .text("Error "+ex.getMessage())
+                    .text("Error " + ex.getMessage())
                     .build();
         }
-
 
 
         return ResponseEntity.builder()
@@ -142,7 +143,41 @@ public class MainMenuRoute implements Route {
             ex.printStackTrace();
             message = SendMessage.builder()
                     .chatId(chatId)
-                    .text("Error "+ex.getMessage())
+                    .text("Error " + ex.getMessage())
+                    .build();
+        }
+
+        return ResponseEntity.builder()
+                .response(message)
+                .build();
+    }
+
+    @MessageMapping(MessageRoutes.GET_USER_BALANCES)
+    public ResponseEntity handleGetUserBalances(@NotNull UpdateWrapper wrapper) {
+        LOG.debug("MainMenu GET_USER_BALANCES");
+        Long userId = wrapper.getUserId();
+        Long chatId = wrapper.getChatId();
+        String userBalancesStr = null;
+        SendMessage message;
+        try {
+            userBalancesStr = bybitService.getUserBalances(userId).stream()
+                    .map(AccountBalanceDto::toString)
+                    .collect(Collectors.joining("\n\n"));
+
+            message = SendMessage.builder()
+                    .chatId(wrapper.getChatId())
+                    .text("Your balances:\n\n" + userBalancesStr)
+                    .build();
+        } catch (GeneralServiceException e) {
+            message = SendMessage.builder()
+                    .chatId(chatId)
+                    .text("Error: " + e.getErrorType().getErrorCode() + " " + e.getMessage())
+                    .build();
+        } catch (Exception ex) { //TODO
+            ex.printStackTrace();
+            message = SendMessage.builder()
+                    .chatId(chatId)
+                    .text("Error " + ex.getMessage())
                     .build();
         }
 

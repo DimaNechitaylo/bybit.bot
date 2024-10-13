@@ -12,4 +12,5 @@ public interface AccountMapper {
     Account toEntity(AccountDto accountDto);
     AccountDto toDto(Account account);
     List<AccountDto> toResponseDtoList(List<Account> byUserId);
+    List<Account> toEntityList(List<AccountDto> accountDtos);
 }

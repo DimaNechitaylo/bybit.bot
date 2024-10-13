@@ -1,6 +1,7 @@
 package com.nechytailo.bybit.bot.service;
 
-import com.nechytailo.bybit.bot.dto.GetBalanceResponseDto;
+import com.nechytailo.bybit.bot.dto.GetAccountBalanceResponseDto;
+import com.nechytailo.bybit.bot.dto.GetCoinBalanceResponseDto;
 import com.nechytailo.bybit.bot.entity.Account;
 import com.nechytailo.bybit.bot.exception.NoAccountsException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,12 +25,27 @@ public class BalanceInfoServiceImpl implements BalanceInfoService {
     private AccountService accountService;
 
     @Override
-    public List<GetBalanceResponseDto> getBalances(String token) throws NoAccountsException {
-        List<GetBalanceResponseDto> balances = new ArrayList<>();
+    public List<GetCoinBalanceResponseDto> getCoinBalances(String token) throws NoAccountsException {
+        List<GetCoinBalanceResponseDto> balances = new ArrayList<>();
         List<Account> accounts = accountService.getAllAccounts();
 
         accounts.forEach((account) -> {
-            GetBalanceResponseDto balanceInfo = bybitApiService.getCoinBalance(account, token);
+            GetCoinBalanceResponseDto balanceInfo = bybitApiService.getCoinBalance(account, token);
+            balances.add(balanceInfo);
+            LOG.info("Balance Info: {}", balanceInfo);
+
+            delayService.doAccountGetBalancesDelay();
+
+        });
+        return balances;
+    }
+
+    @Override
+    public List<GetAccountBalanceResponseDto> getUsersBalances(List<Account> accounts) throws NoAccountsException {
+        List<GetAccountBalanceResponseDto> balances = new ArrayList<>();
+
+        accounts.forEach((account) -> {
+            GetAccountBalanceResponseDto balanceInfo = bybitApiService.getAccountBalances(account);
             balances.add(balanceInfo);
             LOG.info("Balance Info: {}", balanceInfo);
 

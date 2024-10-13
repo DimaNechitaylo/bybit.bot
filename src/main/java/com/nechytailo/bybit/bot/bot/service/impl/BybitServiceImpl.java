@@ -1,5 +1,6 @@
 package com.nechytailo.bybit.bot.bot.service.impl;
 
+import com.nechytailo.bybit.bot.bot.dto.AccountBalanceDto;
 import com.nechytailo.bybit.bot.bot.dto.AccountDto;
 import com.nechytailo.bybit.bot.bot.dto.TradeEventRequestDto;
 import com.nechytailo.bybit.bot.bot.dto.TradeEventResponseDto;
@@ -7,7 +8,10 @@ import com.nechytailo.bybit.bot.bot.exception.UserNotFoundException;
 import com.nechytailo.bybit.bot.bot.service.BybitService;
 import com.nechytailo.bybit.bot.exception.NoAccountsException;
 import com.nechytailo.bybit.bot.exception.NoTradeEventException;
+import com.nechytailo.bybit.bot.mapper.AccountBalanceMapper;
+import com.nechytailo.bybit.bot.mapper.AccountMapper;
 import com.nechytailo.bybit.bot.service.AccountService;
+import com.nechytailo.bybit.bot.service.BalanceInfoService;
 import com.nechytailo.bybit.bot.service.EventService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +29,15 @@ public class BybitServiceImpl implements BybitService {
 
     @Autowired
     private AccountService accountService;
+
+    @Autowired
+    private BalanceInfoService balanceInfoService;
+
+    @Autowired
+    private AccountBalanceMapper accountBalanceMapper;
+
+    @Autowired
+    private AccountMapper accountMapper;
 
 
     @Override
@@ -49,6 +62,18 @@ public class BybitServiceImpl implements BybitService {
     public List<AccountDto> getUserAccounts(Long userId) throws NoAccountsException {
         LOG.debug("BybitServiceImpl.getUserAccounts with userid: {}", userId);
         return accountService.getAccountsByUserId(userId);
+    }
+
+    @Override
+    public List<AccountBalanceDto> getUserBalances(Long userId) throws NoAccountsException { //TODO check place of this logic (converting)
+        List<AccountDto> accountDtos = getUserAccounts(userId);
+        return accountBalanceMapper.toAccountBalanceDtoList(
+                balanceInfoService.getUsersBalances(accountMapper.toEntityList(accountDtos)).stream()
+                        .map(inner -> inner.getResult().getBalanceInfoResponseDtos().stream()
+                                .findFirst()
+                                .orElse(null))
+                        .toList()
+        );
     }
 
 

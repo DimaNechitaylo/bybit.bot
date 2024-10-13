@@ -1,7 +1,8 @@
 package com.nechytailo.bybit.bot.service;
 
 import com.google.gson.Gson;
-import com.nechytailo.bybit.bot.dto.GetBalanceResponseDto;
+import com.nechytailo.bybit.bot.dto.GetAccountBalanceResponseDto;
+import com.nechytailo.bybit.bot.dto.GetCoinBalanceResponseDto;
 import com.nechytailo.bybit.bot.dto.ServerTimeDto;
 import com.nechytailo.bybit.bot.factory.ProxyRequestService;
 import com.nechytailo.bybit.bot.entity.Account;
@@ -88,13 +89,13 @@ public class BybitApiServiceImpl implements BybitApiService {
     @Override
     public void instantTrade(Account account, String coinToBuy, String coinForBuy) { // coinForBuy = USDT
         long startMethodTime = System.currentTimeMillis();
-        GetBalanceResponseDto getBalanceCoinForBuyResponseDto = getCoinBalance(account, coinForBuy);
+        GetCoinBalanceResponseDto getBalanceCoinForBuyResponseDto = getCoinBalance(account, coinForBuy);
         String coinForBuyBalance = roundToDecimal(getBalanceCoinForBuyResponseDto.getResult().getBalance().getWalletBalance());
         placeMarketOrderWithQty(account, coinToBuy+coinForBuy, TradeSide.BUY.toString(), coinForBuyBalance);
 
         delayService.doHoldDelay();
 
-        GetBalanceResponseDto getBalanceCoinToBuyResponseDto = getCoinBalance(account, coinToBuy);
+        GetCoinBalanceResponseDto getBalanceCoinToBuyResponseDto = getCoinBalance(account, coinToBuy);
         String coinToBuyBalance = roundToDecimal(getBalanceCoinToBuyResponseDto.getResult().getBalance().getWalletBalance());
         placeMarketOrderWithQty(account, coinToBuy+coinForBuy, TradeSide.SELL.toString(), coinToBuyBalance);
         long endTime = System.currentTimeMillis();
@@ -102,7 +103,7 @@ public class BybitApiServiceImpl implements BybitApiService {
     }
 
     @Override
-    public GetBalanceResponseDto getCoinBalance(Account account, String token) {
+    public GetCoinBalanceResponseDto getCoinBalance(Account account, String token) {
         long startMethodTime = System.currentTimeMillis();
         RestTemplate restTemplate = proxyRequestService.createRestTemplateWithProxy(account.getProxyParams()); //TODO account == null
         String timestamp = String.valueOf(getServerTime(restTemplate));
@@ -121,10 +122,40 @@ public class BybitApiServiceImpl implements BybitApiService {
 
         HttpEntity<String> entity = new HttpEntity<>(headers);
         long startResponseTime = System.currentTimeMillis();
-        ResponseEntity<GetBalanceResponseDto> response = restTemplate.exchange(url, HttpMethod.GET, entity, GetBalanceResponseDto.class);
+        ResponseEntity<GetCoinBalanceResponseDto> response = restTemplate.exchange(url, HttpMethod.GET, entity, GetCoinBalanceResponseDto.class);
         long endTime = System.currentTimeMillis();
         LOG.debug("Processing getCoinBalance method time: {}", (endTime - startMethodTime));
         LOG.debug("Processing getCoinBalance request time: {}", (endTime - startResponseTime));
+        LOG.debug("Response: {}", response);
+        if (!response.getStatusCode().is2xxSuccessful()) {
+            throw new RuntimeException("Error getting balance: " + response.getStatusCode()); //TODO add new exception
+        }
+        return response.getBody();
+    }
+
+    @Override
+    public GetAccountBalanceResponseDto getAccountBalances(Account account) {
+        long startMethodTime = System.currentTimeMillis();
+        RestTemplate restTemplate = proxyRequestService.createRestTemplateWithProxy(account.getProxyParams()); //TODO account == null
+        String timestamp = String.valueOf(getServerTime(restTemplate));
+        Map<String, Object> params = new HashMap<>();
+        params.put("accountType", accountType);
+        String signature = signService.signGet(account.getApiKey(), account.getApiSecret(), timestamp, params);
+
+        String url = urls.getAccountBalancesUrl(accountType);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("X-BAPI-API-KEY", account.getApiKey());
+        headers.set("X-BAPI-SIGN", signature);
+        headers.set("X-BAPI-TIMESTAMP", timestamp);
+        headers.set("X-BAPI-RECV-WINDOW", recvWindow);
+
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+        long startResponseTime = System.currentTimeMillis();
+        ResponseEntity<GetAccountBalanceResponseDto> response = restTemplate.exchange(url, HttpMethod.GET, entity, GetAccountBalanceResponseDto.class);
+        long endTime = System.currentTimeMillis();
+        LOG.debug("Processing getAccountBalances method time: {}", (endTime - startMethodTime));
+        LOG.debug("Processing getAccountBalances request time: {}", (endTime - startResponseTime));
         LOG.debug("Response: {}", response);
         if (!response.getStatusCode().is2xxSuccessful()) {
             throw new RuntimeException("Error getting balance: " + response.getStatusCode()); //TODO add new exception

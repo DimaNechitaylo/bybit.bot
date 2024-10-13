@@ -17,4 +17,7 @@ public class ByBitEndpoints {
     @Value("${bybit.create.order:/v5/order/create}")
     public String createOrderEndpoint;
 
+    @Value("${bybit.wallet-balance:/v5/account/wallet-balance}")
+    public String accountBalancesEndpoint;
+
 }

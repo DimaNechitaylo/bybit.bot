@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2024-10-10T20:25:31+0300",
+    date = "2024-10-13T23:37:06+0300",
     comments = "version: 1.6.2, compiler: javac, environment: Java 21.0.4 (Oracle Corporation)"
 )
 @Component
@@ -25,10 +25,9 @@ public class EventMapperImpl implements EventMapper {
         TradeEvent tradeEvent = new TradeEvent();
 
         tradeEvent.setExecuteAt( stringToLocalDateTime( tradeEventRequestDto.getExecuteAt() ) );
-        tradeEvent.setDescription( tradeEventRequestDto.getDescription() );
-        tradeEvent.setSymbol( tradeEventRequestDto.getSymbol() );
-        tradeEvent.setSide( tradeEventRequestDto.getSide() );
-        tradeEvent.setQuantity( tradeEventRequestDto.getQuantity() );
+        tradeEvent.setName( tradeEventRequestDto.getName() );
+        tradeEvent.setFirstSymbol( tradeEventRequestDto.getFirstSymbol() );
+        tradeEvent.setSecondSymbol( tradeEventRequestDto.getSecondSymbol() );
 
         return tradeEvent;
     }
@@ -42,10 +41,9 @@ public class EventMapperImpl implements EventMapper {
         TradeEventResponseDto.TradeEventResponseDtoBuilder tradeEventResponseDto = TradeEventResponseDto.builder();
 
         tradeEventResponseDto.executeAt( localDateTimeToString( tradeEvent.getExecuteAt() ) );
-        tradeEventResponseDto.description( tradeEvent.getDescription() );
-        tradeEventResponseDto.symbol( tradeEvent.getSymbol() );
-        tradeEventResponseDto.side( tradeEvent.getSide() );
-        tradeEventResponseDto.quantity( tradeEvent.getQuantity() );
+        tradeEventResponseDto.name( tradeEvent.getName() );
+        tradeEventResponseDto.firstSymbol( tradeEvent.getFirstSymbol() );
+        tradeEventResponseDto.secondSymbol( tradeEvent.getSecondSymbol() );
         if ( tradeEvent.getStatus() != null ) {
             tradeEventResponseDto.status( tradeEvent.getStatus().name() );
         }
@@ -62,10 +60,9 @@ public class EventMapperImpl implements EventMapper {
         TradeEventRequestDto.TradeEventRequestDtoBuilder tradeEventRequestDto = TradeEventRequestDto.builder();
 
         tradeEventRequestDto.executeAt( localDateTimeToString( tradeEvent.getExecuteAt() ) );
-        tradeEventRequestDto.description( tradeEvent.getDescription() );
-        tradeEventRequestDto.symbol( tradeEvent.getSymbol() );
-        tradeEventRequestDto.side( tradeEvent.getSide() );
-        tradeEventRequestDto.quantity( tradeEvent.getQuantity() );
+        tradeEventRequestDto.name( tradeEvent.getName() );
+        tradeEventRequestDto.firstSymbol( tradeEvent.getFirstSymbol() );
+        tradeEventRequestDto.secondSymbol( tradeEvent.getSecondSymbol() );
 
         return tradeEventRequestDto.build();
     }
