@@ -7,13 +7,12 @@ import lombok.Data;
 @Builder
 public class AccountDto {
     private String apiKey;
-    private String apiSecret;
+    private String apiSecret; //TODO delete and add new dto
     private ProxyParamsDto proxyParams;
 
     @Override
     public String toString() {
         return "apiKey='" + apiKey + '\'' +
-                ", apiSecret='" + apiSecret + '\'' +
                 ", proxyParams=" + proxyParams;
     }
 }

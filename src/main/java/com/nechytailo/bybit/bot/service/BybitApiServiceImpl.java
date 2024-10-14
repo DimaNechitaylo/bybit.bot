@@ -78,8 +78,7 @@ public class BybitApiServiceImpl implements BybitApiService {
         long startResponseTime = System.currentTimeMillis();
         ResponseEntity<String> response = restTemplate.postForEntity(url, new HttpEntity<>(paramsJson, headers), String.class);
         long endTime = System.currentTimeMillis();
-        LOG.debug("Processing placeMarketOrder method time: {}", (endTime - startMethodTime));
-        LOG.debug("Processing placeMarketOrder request time: {}", (endTime - startResponseTime));
+        LOG.debug("Processing placeMarketOrder request time: {}, method time: {}", (endTime - startResponseTime), (endTime - startMethodTime));
         LOG.debug("Response: {}", response);
         if (!response.getStatusCode().is2xxSuccessful()) {
             throw new RuntimeException("Error placing order: " + response.getStatusCode());
@@ -88,6 +87,7 @@ public class BybitApiServiceImpl implements BybitApiService {
 
     @Override
     public void instantTrade(Account account, String coinToBuy, String coinForBuy) { // coinForBuy = USDT
+        LOG.debug("Start instantTrade for account: {}", account.getId());
         long startMethodTime = System.currentTimeMillis();
         GetCoinBalanceResponseDto getBalanceCoinForBuyResponseDto = getCoinBalance(account, coinForBuy);
         String coinForBuyBalance = roundToDecimal(getBalanceCoinForBuyResponseDto.getResult().getBalance().getWalletBalance());
@@ -99,7 +99,7 @@ public class BybitApiServiceImpl implements BybitApiService {
         String coinToBuyBalance = roundToDecimal(getBalanceCoinToBuyResponseDto.getResult().getBalance().getWalletBalance());
         placeMarketOrderWithQty(account, coinToBuy+coinForBuy, TradeSide.SELL.toString(), coinToBuyBalance);
         long endTime = System.currentTimeMillis();
-        LOG.debug("Processing instantTrade method time: {}", (endTime - startMethodTime));
+        LOG.debug("Processing instantTrade method time: {}, for account: {}", (endTime - startMethodTime), account.getId());
     }
 
     @Override
@@ -124,8 +124,7 @@ public class BybitApiServiceImpl implements BybitApiService {
         long startResponseTime = System.currentTimeMillis();
         ResponseEntity<GetCoinBalanceResponseDto> response = restTemplate.exchange(url, HttpMethod.GET, entity, GetCoinBalanceResponseDto.class);
         long endTime = System.currentTimeMillis();
-        LOG.debug("Processing getCoinBalance method time: {}", (endTime - startMethodTime));
-        LOG.debug("Processing getCoinBalance request time: {}", (endTime - startResponseTime));
+        LOG.debug("Processing getCoinBalance request time: {}, method time: {}", (endTime - startResponseTime), (endTime - startMethodTime));
         LOG.debug("Response: {}", response);
         if (!response.getStatusCode().is2xxSuccessful()) {
             throw new RuntimeException("Error getting balance: " + response.getStatusCode()); //TODO add new exception
@@ -154,8 +153,7 @@ public class BybitApiServiceImpl implements BybitApiService {
         long startResponseTime = System.currentTimeMillis();
         ResponseEntity<GetAccountBalanceResponseDto> response = restTemplate.exchange(url, HttpMethod.GET, entity, GetAccountBalanceResponseDto.class);
         long endTime = System.currentTimeMillis();
-        LOG.debug("Processing getAccountBalances method time: {}", (endTime - startMethodTime));
-        LOG.debug("Processing getAccountBalances request time: {}", (endTime - startResponseTime));
+        LOG.debug("Processing getAccountBalances request time: {}, method time: {}", (endTime - startResponseTime), (endTime - startMethodTime));
         LOG.debug("Response: {}", response);
         if (!response.getStatusCode().is2xxSuccessful()) {
             throw new RuntimeException("Error getting balance: " + response.getStatusCode()); //TODO add new exception

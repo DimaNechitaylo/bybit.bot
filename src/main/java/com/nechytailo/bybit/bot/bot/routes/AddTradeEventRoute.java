@@ -43,7 +43,7 @@ public class AddTradeEventRoute implements Route {
         SendMessage message = SendMessage.builder()
                 .chatId(wrapper.getChatId())
                 .replyMarkup(replyKeyboardMarkup)
-                .text("Send event data in the required format:\n Description, symbol, side, qty, yyyy-MM-dd HH:mm:ss.\n Example:\n Description of my event, BTCUSDT, BUY, 50, 2024-10-08 21:50:00")
+                .text("Send event data in the required format:\n\n Name,first symbol,second symbol,yyyy-MM-dd HH:mm:ss.\n\n Example:\nEvent0,BTC,USDT,2024-10-08 21:50:00")
                 .build();
         return ResponseList.builder()
                 .response(message)
