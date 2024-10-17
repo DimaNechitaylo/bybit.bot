@@ -20,4 +20,7 @@ public class ByBitEndpoints {
     @Value("${bybit.wallet-balance:/v5/account/wallet-balance}")
     public String accountBalancesEndpoint;
 
+    @Value("${bybit.market-price:/v5/market/tickers}")
+    public String marketPriceEndpoint;
+
 }

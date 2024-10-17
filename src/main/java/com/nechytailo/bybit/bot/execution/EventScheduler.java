@@ -43,7 +43,7 @@ public class EventScheduler {
         return Duration.ofMinutes(lookAheadTime);
     }
 
-    @Scheduled(fixedRate = 100000) // 100 sec
+    @Scheduled(fixedRate = 10000) // 10 sec //TODO
     public void scheduleUpcomingEvents() {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime lookAheadTime = now.plus(getLookAheadDuration());

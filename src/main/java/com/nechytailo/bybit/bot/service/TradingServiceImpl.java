@@ -7,8 +7,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import org.springframework.beans.factory.annotation.Value;
-
 import java.util.*;
 
 @Service
@@ -29,7 +27,7 @@ public class TradingServiceImpl implements TradingService{
     public void buy(String symbol, String side, String quantity) throws NoAccountsException {
         List<Account> accounts = accountService.getAllAccounts();
 
-        accounts.forEach((account) -> { //TODO проверка на повторение аккаунтов. (может юзaть Set)
+        accounts.forEach((account) -> { //TODO accounts duplicates. (maybe use Set)
             bybitApiService.placeMarketOrderWithQty(account, symbol, side, quantity);
 
             delayService.doAccountTradeDelay();
@@ -38,11 +36,22 @@ public class TradingServiceImpl implements TradingService{
     }
 
     @Override
-    public void trade(String coinToBuy, String coinForBuy) throws NoAccountsException {
+    public void tradeMarket(String coinToBuy, String coinForBuy) throws NoAccountsException {
         List<Account> accounts = accountService.getAllAccounts();
 
-        accounts.forEach((account) -> { //TODO проверка на повторение аккаунтов. (может юзaть Set)
-            bybitApiService.instantTrade(account, coinToBuy, coinForBuy);
+        accounts.forEach((account) -> { //TODO accounts duplicates. (maybe use Set)
+            bybitApiService.instantTradeMarket(account, coinToBuy, coinForBuy);
+            delayService.doAccountTradeDelay();
+        });
+
+    }
+
+    @Override
+    public void tradeLimit(String coinToBuy, String coinForBuy) throws NoAccountsException {
+        List<Account> accounts = accountService.getAllAccounts();
+
+        accounts.forEach((account) -> { //TODO accounts duplicates. (maybe use Set)
+            bybitApiService.instantTradeLimit(account, coinToBuy, coinForBuy);
             delayService.doAccountTradeDelay();
         });
 

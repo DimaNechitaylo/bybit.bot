@@ -19,6 +19,7 @@ public class URLs {
     private String coinBalanceUrl;
     private String createOrderUrl;
     private String accountBalancesUrl;
+    private String marketPriceUrl;
 
     @PostConstruct
     public void init() {
@@ -26,6 +27,7 @@ public class URLs {
         this.coinBalanceUrl = BYBIT_URL + byBitEndpoints.getCoinBalanceEndpoint();
         this.createOrderUrl = BYBIT_URL + byBitEndpoints.getCreateOrderEndpoint();
         this.accountBalancesUrl = BYBIT_URL + byBitEndpoints.getAccountBalancesEndpoint();
+        this.marketPriceUrl = BYBIT_URL + byBitEndpoints.getMarketPriceEndpoint();
     }
 
     public String getCoinBalanceUrl(String accountType, String token) {
@@ -34,6 +36,10 @@ public class URLs {
 
     public String getAccountBalancesUrl(String accountType) {
         return accountBalancesUrl + "?" + "accountType=" + accountType;
+    }
+
+    public String getMarketPriceUrl(String symbol, String category) {
+        return marketPriceUrl + "?" + "symbol=" + symbol + "&category=" + category;
     }
 
 }

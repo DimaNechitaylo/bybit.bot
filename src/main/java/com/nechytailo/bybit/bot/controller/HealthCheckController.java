@@ -1,9 +1,12 @@
 package com.nechytailo.bybit.bot.controller;
 
-import com.nechytailo.bybit.bot.dto.GetAccountBalanceResponseDto;
 import com.nechytailo.bybit.bot.dto.GetCoinBalanceResponseDto;
+import com.nechytailo.bybit.bot.entity.Account;
+import com.nechytailo.bybit.bot.entity.ProxyParams;
+import com.nechytailo.bybit.bot.entity.User;
 import com.nechytailo.bybit.bot.exception.NoAccountsException;
 import com.nechytailo.bybit.bot.service.BalanceInfoService;
+import com.nechytailo.bybit.bot.service.BybitApiService;
 import com.nechytailo.bybit.bot.service.TradingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,6 +24,8 @@ public class HealthCheckController {
 
     @Autowired
     TradingService tradingService;
+    @Autowired
+    BybitApiService bybitApiService;
 
     @GetMapping("/healthCheck")
     public String healthCheck() {
@@ -38,10 +43,21 @@ public class HealthCheckController {
         return ResponseEntity.ok("traded");
     }
 
-    @GetMapping("/trade")
-    public ResponseEntity<?> trade() {
+    @GetMapping("/tradeMarket")
+    public ResponseEntity<?> tradeMarket() {
         try {
-            tradingService.trade("BTC", "USDT");
+            tradingService.tradeMarket("BTC", "USDT");
+        } catch (NoAccountsException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("No accounts available");
+        }
+        return ResponseEntity.ok("traded");
+    }
+
+    @GetMapping("/tradeLimit")
+    public ResponseEntity<?> tradeLimit() {
+        try {
+            tradingService.tradeLimit("BTC", "USDT");
         } catch (NoAccountsException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body("No accounts available");
@@ -62,6 +78,8 @@ public class HealthCheckController {
         }
         return ResponseEntity.ok(assets);
     }
+
+//
 //    @GetMapping("/wallet-balance")
 //    public ResponseEntity<?> getWalletBalance() {
 //        String assets;
