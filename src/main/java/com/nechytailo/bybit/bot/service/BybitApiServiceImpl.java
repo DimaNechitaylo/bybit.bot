@@ -51,6 +51,7 @@ public class BybitApiServiceImpl implements BybitApiService {
     @Override
     public void placeMarketOrderWithQty(Account account, String symbol, String side, String quantity) {
         long startMethodTime = System.currentTimeMillis();
+        LOG.debug("placeMarketOrderWithQty parameters: Account: {}, {} {} {}", account.getApiKey(), side, symbol, quantity);
 
         RestTemplate restTemplate = proxyRequestService.createRestTemplateWithProxy(account.getProxyParams()); //TODO account == null
         String timestamp = String.valueOf(getServerTime(restTemplate));
@@ -79,7 +80,7 @@ public class BybitApiServiceImpl implements BybitApiService {
         ResponseEntity<String> response = restTemplate.postForEntity(url, new HttpEntity<>(paramsJson, headers), String.class);
         long endTime = System.currentTimeMillis();
         LOG.debug("Processing placeMarketOrder request time: {}, method time: {}", (endTime - startResponseTime), (endTime - startMethodTime));
-        LOG.debug("Response: {}", response);
+        LOG.debug("placeMarketOrderWithQty Response: {}", response);
         if (!response.getStatusCode().is2xxSuccessful()) {
             throw new RuntimeException("Error placing order: " + response.getStatusCode());
         }
@@ -154,7 +155,7 @@ public class BybitApiServiceImpl implements BybitApiService {
         ResponseEntity<GetAccountBalanceResponseDto> response = restTemplate.exchange(url, HttpMethod.GET, entity, GetAccountBalanceResponseDto.class);
         long endTime = System.currentTimeMillis();
         LOG.debug("Processing getAccountBalances request time: {}, method time: {}", (endTime - startResponseTime), (endTime - startMethodTime));
-        LOG.debug("Response: {}", response);
+        LOG.debug("GetAccountBalance Response: {}", response);
         if (!response.getStatusCode().is2xxSuccessful()) {
             throw new RuntimeException("Error getting balance: " + response.getStatusCode()); //TODO add new exception
         }
@@ -177,7 +178,7 @@ public class BybitApiServiceImpl implements BybitApiService {
 
     private String roundToDecimal(String qty) {
         BigDecimal number = new BigDecimal(qty);
-        BigDecimal roundedNumber = number.setScale(5, RoundingMode.DOWN);
+        BigDecimal roundedNumber = number.setScale(0, RoundingMode.DOWN);
         return roundedNumber.toPlainString();
     }
 
